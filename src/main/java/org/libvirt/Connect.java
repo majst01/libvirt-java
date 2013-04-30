@@ -49,21 +49,58 @@ public class Connect {
         static final int PMSUSPEND = 12;
     }
 
+    /**
+     * Abstract base class for all domain events.
+     */
     public static abstract class DomainEvent {
         /* Event Callbacks */
 
-        interface IOErrorCallback {
+        /**
+         * A Interface which needs to be implemented if you want to get notified about domain io error events. 
+         */
+        public interface IOErrorCallback {
+            /**
+             * The eventid for a io error event.
+             */
             final int eventID = DomainEventID.IO_ERROR;
 
+            /**
+             * This method get called upon a domain reboot event.
+             *
+             * @param connect
+             * 			the connection.
+             * @param domain
+             * 			the domain which got a PMWakeup event.
+             * @param srcPath
+             *          the src of the block device with errors. 
+             * @param devAlias 
+             * 			the device alias of the block device with errors.
+             * @param action 
+             * 			action if available, otherwise 0.
+             */
             void onIOError(Connect connect, Domain domain,
                            String srcPath,
                            String devAlias,
                            int action);
         }
 
+        /**
+         * A Interface which needs to be implemented if you want to get notified about domain reboot events. 
+         */
         public interface RebootCallback {
+            /**
+             * The eventid for a reboot event.
+             */
             final int eventID = DomainEventID.REBOOT;
 
+            /**
+             * This method get called upon a domain reboot event.
+             *
+             * @param connect
+             * 			the connection.
+             * @param domain
+             * 			the domain which got a PMWakeup event.
+             */
             void onReboot(Connect connect, Domain domain);
         }
 
@@ -71,32 +108,103 @@ public class Connect {
          * @see <a href="http://libvirt.org/html/libvirt-libvirt.html#virConnectDomainEventCallback">virConnectDomainEventCallback</a>
          */
         public interface LifecycleCallback {
+            /**
+             * The type of callback.
+             */
             public static enum Event {
+                /**
+                 * The domain was defined.
+                 */
                 DEFINED,
+                /**
+                 * The domain was undefined.
+                 */
                 UNDEFINED,
+                /**
+                 * The domain was started.
+                 */
                 STARTED,
+                /**
+                 * The domain was suspendend.
+                 */
                 SUSPENDED,
+                /**
+                 * The domain was resumed.
+                 */
                 RESUMED,
+                /**
+                 * The domain was stopped.
+                 */
                 STOPPED,
+                /**
+                 * The domain was shut down.
+                 */
                 SHUTDOWN;
             }
 
+            /**
+             * The eventid for a Livecylce Event.
+             */
             final int eventID = DomainEventID.LIFECYCLE;
 
+            /**
+             * This method get called upon a Livecycle event.
+             *
+             * @param connect
+             * 			the connection.
+             * @param domain
+             * 			the domain on which a livecycle changed.
+             * @param event
+             * 			the event itself.
+             * @param detail
+             * 			details if available, otherwise 0.
+             */
             void onLifecycleChange(Connect connect, Domain domain,
                                    Event event,
                                    int detail);
         }
 
+        /**
+         * A Interface which needs to be implemented if you want to get notified about domain PMWakeup events. 
+         */
         public interface PMWakeupCallback {
+            /**
+             * The eventId for a PMWakeupCallback.
+             */
             final int eventID = DomainEventID.PMWAKEUP;
 
+            /**
+             * This method get called upon a PMWakeup event.
+             *
+             * @param connect
+             * 			the connection.
+             * @param domain
+             * 			the domain which got a PMWakeup event.
+             * @param reason
+             * 			the reason if available, otherwise 0.
+             */
             void onPMWakeup(Connect connect, Domain domain, int reason);
         }
 
+        /**
+         * A Interface which needs to be implemented if you want to get notified about domain PMSuspend events. 
+         */
         public interface PMSuspendCallback {
+            /**
+             * The eventId for a PMSuspendCallback.
+             */
             final int eventID = DomainEventID.PMSUSPEND;
 
+            /**
+             * This method get called upon a PMSuspend event.
+             *
+             * @param connect
+             * 			the connection.
+             * @param domain
+             * 			the domain which got a PMWakeup event.
+             * @param reason
+             * 			the reason if available, otherwise 0.
+             */
             void onPMSuspend(Connect connect, Domain domain, int reason);
         }
     }
@@ -119,7 +227,9 @@ public class Connect {
     }
 
     /**
-     * Helper function to convert bytes into ints for the UUID calls
+     * Helper function to convert bytes into ints for the UUID calls.
+     * @param bytes the uuid as byte array
+     * @return the uuid in ints.
      */
     public static int[] convertUUIDBytes(byte bytes[]) {
         int[] returnValue = new int[Libvirt.VIR_UUID_BUFLEN];
@@ -132,7 +242,10 @@ public class Connect {
     }
 
     /**
-     * Helper function to convert UUIDs into a stirng for the UUID calls
+     * Helper function to convert UUIDs into a string for the UUID calls.
+     * 
+     * @param UUID the UUID to convert.
+     * @return the uuid as byte array.
      */
     public static byte[] createUUIDBytes(int[] UUID) {
         byte[] bytes = new byte[Libvirt.VIR_UUID_BUFLEN];
