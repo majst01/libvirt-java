@@ -136,7 +136,6 @@ public abstract class ConnectAuth implements Libvirt.VirConnectAuthCallback {
          *
          * @return The integer equivalent
          */
-        @SuppressWarnings("all")
         public int mapToInt() {
             switch (this) {
                 case VIR_CRED_USERNAME:
@@ -157,9 +156,11 @@ public abstract class ConnectAuth implements Libvirt.VirConnectAuthCallback {
                     return 8;
                 case VIR_CRED_EXTERNAL:
                     return 9;
+                default:
+                    // We may never reach this point
+                    assert (false);
+                	break;
             }
-            // We may never reach this point
-            assert (false);
             return 0;
         }
     }
