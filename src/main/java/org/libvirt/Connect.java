@@ -526,17 +526,16 @@ public class Connect {
      * <p>
      * Failure to do so may result in connections being closed
      * unexpectedly as a result of keepalive timeout.
+     * @throws LibvirtException on failure
      *
      * @see #initEventLoop()
      */
     public void processEvent() throws LibvirtException {
         if (libvirt.virEventRunDefaultImpl() == -1)
             ErrorHandler.processError(Libvirt.INSTANCE);
-   }
+    }
 
-    int domainEventRegister(Domain domain, int eventID, Libvirt.VirDomainEventCallback cb)
-        throws LibvirtException
-    {
+    int domainEventRegister(Domain domain, int eventID, Libvirt.VirDomainEventCallback cb) throws LibvirtException {
         DomainPointer ptr = domain == null ? null : domain.VDP;
 
         return processError(libvirt.virConnectDomainEventRegisterAny(VCP, ptr,
@@ -545,16 +544,17 @@ public class Connect {
     }
 
     int domainEventRegister(Domain domain, final DomainEvent.IOErrorCallback cb) throws LibvirtException {
-        if (cb == null)
+        if (cb == null) {
             throw new IllegalArgumentException("IOError callback cannot be null");
-
+        }
+        
         Libvirt.VirConnectDomainEventIOErrorCallback virCB = new Libvirt.VirConnectDomainEventIOErrorCallback() {
                 @Override
                 public void eventCallback(ConnectionPointer virConnectPtr, DomainPointer virDomainPointer,
                                           String srcPath,
                                           String devAlias,
                                           int action,
-                                          com.sun.jna.Pointer opaque) {
+                                          Pointer opaque) {
                     assert(VCP.equals(virConnectPtr));
 
                     Domain d = new Domain(Connect.this, virDomainPointer);
@@ -585,14 +585,15 @@ public class Connect {
     }
 
     int domainEventRegister(Domain domain, final DomainEvent.RebootCallback cb) throws LibvirtException {
-        if (cb == null)
+        if (cb == null) {
             throw new IllegalArgumentException("RebootCallback cannot be null");
-
+        }
+        
         Libvirt.VirConnectDomainEventGenericCallback virCB = new Libvirt.VirConnectDomainEventGenericCallback() {
                 @Override
                 public void eventCallback(ConnectionPointer virConnectPtr,
                                           DomainPointer virDomainPointer,
-                                          com.sun.jna.Pointer opaque)
+                                          Pointer opaque)
                 {
                     assert(VCP.equals(virConnectPtr));
                     Domain d = new Domain(Connect.this, virDomainPointer);
@@ -604,9 +605,10 @@ public class Connect {
     }
 
     int domainEventRegister(Domain domain, final DomainEvent.LifecycleCallback cb) throws LibvirtException {
-        if (cb == null)
+        if (cb == null) {
             throw new IllegalArgumentException("LifecycleCallback cannot be null");
-
+        }
+        
         final DomainEvent.LifecycleCallback.Event events[] = DomainEvent.LifecycleCallback.Event.values();
 
         Libvirt.VirConnectDomainEventCallback virCB = new Libvirt.VirConnectDomainEventCallback() {
@@ -614,7 +616,7 @@ public class Connect {
                 public int eventCallback(ConnectionPointer virConnectPtr, DomainPointer virDomainPointer,
                                          int event,
                                          int detail,
-                                         com.sun.jna.Pointer opaque)
+                                         Pointer opaque)
                 {
                     assert(VCP.equals(virConnectPtr));
 
@@ -645,15 +647,15 @@ public class Connect {
      * @return The return value from this method is a positive integer identifier for the callback.
      * @throws LibvirtException on failure
      */
-    public int domainEventRegister(final DomainEvent.LifecycleCallback cb) throws LibvirtException
-    {
+    public int domainEventRegister(final DomainEvent.LifecycleCallback cb) throws LibvirtException {
         return domainEventRegister(null, cb);
     }
 
     int domainEventRegister(Domain domain, final DomainEvent.PMWakeupCallback cb) throws LibvirtException {
-        if (cb == null)
+        if (cb == null) {
             throw new IllegalArgumentException("PMWakeupCallback cannot be null");
-
+        }
+        
         Libvirt.VirDomainEventCallback virCB =
             new Libvirt.VirConnectDomainEventPMChangeCallback() {
                 @Override
@@ -669,8 +671,9 @@ public class Connect {
     }
 
     int domainEventRegister(Domain domain, final DomainEvent.PMSuspendCallback cb) throws LibvirtException {
-        if (cb == null)
+        if (cb == null) {
             throw new IllegalArgumentException("PMSuspendCallback cannot be null");
+        }
 
         Libvirt.VirDomainEventCallback virCB =
             new Libvirt.VirConnectDomainEventPMChangeCallback() {
@@ -698,8 +701,7 @@ public class Connect {
      * @return The return value from this method is a positive integer identifier for the callback.
      * @throws LibvirtException on failure
      */
-    public int domainEventRegister(final DomainEvent.PMSuspendCallback cb) throws LibvirtException
-    {
+    public int domainEventRegister(final DomainEvent.PMSuspendCallback cb) throws LibvirtException {
         return domainEventRegister(null, cb);
     }
 
@@ -715,8 +717,7 @@ public class Connect {
      * @return The return value from this method is a positive integer identifier for the callback.
      * @throws LibvirtException on failure
      */
-    public int domainEventRegister(final DomainEvent.PMWakeupCallback cb) throws LibvirtException
-    {
+    public int domainEventRegister(final DomainEvent.PMWakeupCallback cb) throws LibvirtException {
         return domainEventRegister(null, cb);
     }
 
@@ -732,9 +733,7 @@ public class Connect {
      * @return The return value from this method is a positive integer identifier for the callback.
      * @throws LibvirtException on failure
      */
-    public int domainEventRegister(final DomainEvent.RebootCallback cb)
-        throws LibvirtException
-    {
+    public int domainEventRegister(final DomainEvent.RebootCallback cb) throws LibvirtException {
         return domainEventRegister(null, cb);
     }
 
